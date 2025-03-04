@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>Countdown to My Queen's Birthday 👑</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(45deg, #0b0b2d, #1a1a4f);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            direction: rtl;
+            position: relative;
+            color: white;
+        }
+
+        .floating-hearts span {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            animation: float 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px 30px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 50px rgba(255, 105, 180, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255,105,180,0.5);
+        }
+
+        .countdown-box {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .time-unit {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .time-unit::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(45deg) translateX(-150%); }
+            100% { transform: rotate(45deg) translateX(150%); }
+        }
+
+        .time-label {
+            font-family: 'Vazirmatn';
+            font-size: 1.2em;
+            color: #ff69b4;
+            margin-bottom: 10px;
+        }
+
+        .time-value {
+            font-family: 'Orbitron';
+            font-size: 2.5em;
+            color: #00ff9d;
+            text-shadow: 0 0 15px rgba(0,255,157,0.5);
+        }
+
+        .digital-clock {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid #ff69b4;
+            display: none;
+        }
+
+        .clock-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ff1493;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(255,20,147,0.5);
+        }
+
+        .clock-toggle:hover {
+            background: #ff69b4;
+            transform: scale(1.1);
+        }
+
+        .heart-container {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .love-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5em;
+            text-align: center;
+            color: white;
+            text-shadow: 0 0 20px rgba(255,20,147,0.8);
+            z-index: 4;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts"></div>
+    
+    <div class="container">
+        <h1>⏳زمان باقیمانده تا تولد دخترم 👑</h1>
+        <div class="countdown-box">
+            <div class="time-unit">
+                <div class="time-label">روز</div>
+                <div class="time-value" id="days">00</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-label">ساعت</div>
+                <div class="time-value" id="hours">00</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-label">دقیقه</div>
+                <div class="time-value" id="minutes">00</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-label">ثانیه</div>
+                <div class="time-value" id="seconds">00</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="digital-clock" id="digitalClock">
+        <span id="clockTime">00:00:00</span>
+    </div>
+
+    <button class="clock-toggle" onclick="toggleClock()">ساعت دیجیتال ⏰</button>
+
+    <div class="heart-container" id="heartContainer">
+        <div class="love-message">
+            𝑯𝒂𝒑𝒑𝒚 𝒃𝒊𝒓𝒕𝒉𝒅𝒂𝒚 𝒕𝒐 𝒕𝒉𝒆 𝒈𝒊𝒓𝒍 𝒘𝒉𝒐 𝒔𝒕𝒐𝒍𝒆 𝒎𝒚 𝒉𝒆𝒂𝒓𝒕<br>
+            𝒂𝒏𝒅 𝒎𝒂𝒅𝒆 𝒎𝒆 𝒕𝒉𝒆 𝒉𝒂𝒑𝒑𝒊𝒆𝒔𝒕 𝒑𝒆𝒓𝒔𝒐𝒏 𝒊𝒏 𝒕𝒉𝒆 𝒘𝒐𝒓𝒍𝒅<br>
+            𝑰 𝒍𝒐𝒗𝒆 𝒚𝒐𝒖 𝒎𝒐𝒓𝒆 𝒕𝒉𝒂𝒏 𝒘𝒐𝒓𝒅𝒔 𝒄𝒂𝒏 𝒔𝒂𝒚
+        </div>
+    </div>
+
+    <script>
+        // تنظیمات تاریخ
+        const targetDate = new Date("2025-03-06T00:00:00+03:30");
+        let clockVisible = false;
+
+        // ایجاد قلبهای شناور
+        function createHearts() {
+            const heartsContainer = document.querySelector('.floating-hearts');
+            for(let i=0; i<20; i++) {
+                const heart = document.createElement('span');
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heartsContainer.appendChild(heart);
+            }
+        }
+
+        // ساعت دیجیتال
+        function updateClock() {
+            if(!clockVisible) return;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fa-IR');
+            document.getElementById('clockTime').textContent = timeString;
+        }
+
+        function toggleClock() {
+            clockVisible = !clockVisible;
+            const clock = document.getElementById('digitalClock');
+            clock.style.display = clockVisible ? 'block' : 'none';
+        }
+
+        // بروزرسانی تایمر
+        function updateTimer() {
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if(diff <= 0) {
+                triggerCelebration();
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        // جشن پایانی
+        function triggerCelebration() {
+            document.querySelector('.container').style.display = 'none';
+            const heartContainer = document.getElementById('heartContainer');
+            heartContainer.style.display = 'block';
+            setTimeout(() => heartContainer.style.opacity = 1, 100);
+
+            // افکت کانفتی
+            const duration = 5000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 10,
+                    angle: 60,
+                    spread: 80,
+                    origin: { x: 0 },
+                    colors: ['#ff69b4', '#ff1493', '#ff00ff']
+                });
+                confetti({
+                    particleCount: 10,
+                    angle: 120,
+                    spread: 80,
+                    origin: { x: 1 },
+                    colors: ['#ff69b4', '#ff1493', '#ff00ff']
+                });
+
+                if(Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // اجرای اولیه
+        createHearts();
+        setInterval(() => {
+            updateTimer();
+            updateClock();
+        }, 1000);
+    </script>
+</body>
+</html>
